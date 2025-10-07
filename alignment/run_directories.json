@@ -1,0 +1,12 @@
+{
+  "muon_runs": [
+    "/eos/cms/store/group/dpg_hgcal/tb_hgcal/2025/SepTestBeam2025/Run112080",
+    "/eos/cms/store/group/dpg_hgcal/tb_hgcal/2025/SepTestBeam2025/Run112079",
+    "/eos/cms/store/group/dpg_hgcal/tb_hgcal/2025/SepTestBeam2025/Run112078",
+    "/eos/cms/store/group/dpg_hgcal/tb_hgcal/2025/SepTestBeam2025/Run112077",
+    "/eos/cms/store/group/dpg_hgcal/tb_hgcal/2025/SepTestBeam2025/Run112076",
+    "/eos/cms/store/group/dpg_hgcal/tb_hgcal/2025/SepTestBeam2025/Run111942",
+    "/eos/cms/store/group/dpg_hgcal/tb_hgcal/2025/SepTestBeam2025/Run111940",
+    "/eos/cms/store/group/dpg_hgcal/tb_hgcal/2025/SepTestBeam2025/Run112096"
+  ]
+}
