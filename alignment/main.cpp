@@ -4,7 +4,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "ROOT/RDataFrame.hxx"
-
+/*
 void to_be_named(std::vector<std::string> file){
     TFile *f1;
     TTree *t1;
@@ -36,7 +36,7 @@ void to_be_named(std::vector<std::string> file){
 	}
     }
 }
-
+*/
 int main() {
     std::vector<std::string> dirs;
     try {
@@ -54,7 +54,6 @@ int main() {
         std::cout << "Found " << files.size() << " files:\n";
         for (const auto& f : files){
             std::cout << "  " << f << '\n';
-	    to_be_named(); 
 	}
     }
 
