@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+
 void draw_1D_histo(const std::string& input_root_file,
                    const std::string& tree_name,
                    const std::string& branch_name,
