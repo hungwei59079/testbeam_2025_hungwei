@@ -26,4 +26,15 @@ void draw_1D_multi_histo(int length,
                          const std::string& y_title = "Events",
                          const std::string& output_root_file = "output.root");
 
-
+void draw_2D_histo(const std::string& input_root_file,
+                   const std::string& tree_name,
+                   const std::string& branch_for_x,
+                   const std::string& branch_for_y,
+                   const std::string& histo_name,
+                   const std::string& histo_title,
+                   int bins_x, int bins_y,
+                   double min_x, double min_y,
+                   double max_x, double max_y,
+                   const std::string& x_title = "X",
+                   const std::string& y_title = "Y",
+                   const std::string& output_root_file = "output.root");
