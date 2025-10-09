@@ -64,7 +64,7 @@ void draw_1D_histo(const std::string& input_root_file,
 
     if (leaf_type == "Float_t") {
         Float_t value;
-	t1->SetBranchAddress(branch_name.c_str(), value&);
+	t1->SetBranchAddress(branch_name.c_str(), &value);
         for (Long64_t i = 0; i < n_entries; ++i) {
             t1->GetEntry(i);
 	    h1->Fill(value);
@@ -72,7 +72,7 @@ void draw_1D_histo(const std::string& input_root_file,
     }
     else if (leaf_type == "Double_t"){
 	Double_t value;
-        t1->SetBranchAddress(branch_name.c_str(), value&);
+        t1->SetBranchAddress(branch_name.c_str(), &value);
         for (Long64_t i = 0; i < n_entries; ++i) {
             t1->GetEntry(i);
             h1->Fill(value);
@@ -80,7 +80,7 @@ void draw_1D_histo(const std::string& input_root_file,
     }
     else if (leaf_type == "UInt_t"){
 	UInt_t value;
-        t1->SetBranchAddress(branch_name.c_str(), value&);
+        t1->SetBranchAddress(branch_name.c_str(), &value);
         for (Long64_t i = 0; i < n_entries; ++i) {
             t1->GetEntry(i);
             h1->Fill(value);
@@ -88,7 +88,7 @@ void draw_1D_histo(const std::string& input_root_file,
     }
     else if (leaf_type == "Int_t"){
 	Int_t value;
-        t1->SetBranchAddress(branch_name.c_str(), value&);
+        t1->SetBranchAddress(branch_name.c_str(), &value);
         for (Long64_t i = 0; i < n_entries; ++i) {
             t1->GetEntry(i);
             h1->Fill(value);
@@ -96,7 +96,7 @@ void draw_1D_histo(const std::string& input_root_file,
     }
     else if (leaf_type == "UShort_t"){
 	UShort_t value;
-        t1->SetBranchAddress(branch_name.c_str(), value&);
+        t1->SetBranchAddress(branch_name.c_str(), &value);
         for (Long64_t i = 0; i < n_entries; ++i) {
             t1->GetEntry(i);
             h1->Fill(value);
@@ -104,7 +104,7 @@ void draw_1D_histo(const std::string& input_root_file,
     }
     else if (leaf_type == "Short_t"){
 	Short_t value;
-        t1->SetBranchAddress(branch_name.c_str(), value&);
+        t1->SetBranchAddress(branch_name.c_str(), &value);
         for (Long64_t i = 0; i < n_entries; ++i) {
             t1->GetEntry(i);
             h1->Fill(value);
