@@ -33,8 +33,8 @@ int main() {
         name,
         title,
         100,
-        0,
-        500,
+        50,
+        150,
         "ADC",
         "Events",
         "test_output.root"
