@@ -21,19 +21,24 @@ void to_be_named(const std::string& input_file, const std::string& output_file =
     }
 
     // --- Input branches ---
-    std::vector<Float_t>* HGCHit_energy = nullptr;
-    std::vector<Int_t>* HGCHit_layer = nullptr;
-    UInt_t HGCMetaData_trigTime;
+// --- Input branches ---
+    const int MAXHITS = 3000;  // safe upper bound
 
-    tree->SetBranchAddress("HGCHit_energy", &HGCHit_energy);
-    tree->SetBranchAddress("HGCHit_layer", &HGCHit_layer);
+    Float_t HGCHit_energy[MAXHITS];
+    Int_t   HGCHit_layer[MAXHITS];
+    UInt_t  HGCMetaData_trigTime;
+    Int_t  nHGCHit;  // size counter branch name; adjust to match your file
+
+    tree->SetBranchStatus("*", 0);
+    tree->SetBranchStatus("HGCHit_layer", 1);
+    tree->SetBranchStatus("HGCHit_energy", 1);
+    tree->SetBranchStatus("HGCMetaData_trigTime", 1);
+    tree->SetBranchStatus("nHGCHit", 1);
+
+    tree->SetBranchAddress("HGCHit_energy", HGCHit_energy);
+    tree->SetBranchAddress("HGCHit_layer", HGCHit_layer);
     tree->SetBranchAddress("HGCMetaData_trigTime", &HGCMetaData_trigTime);
-    tree->SetBranchStatus ("*", 0);
-    tree->SetBranchStatus ("HGCHit_layer",1);
-    tree->SetBranchStatus ("HGCHit_energy",1);
-    tree->SetBranchStatus ("HGCMetaData_trigTime",1);
-
-
+    tree->SetBranchAddress("nHGCHit", &nHGCHit);
     // --- Output file ---
     // "UPDATE" lets us append to the same file if it already exists
     TFile* outFile = TFile::Open(output_file.c_str(), "UPDATE");
@@ -52,11 +57,11 @@ void to_be_named(const std::string& input_file, const std::string& output_file =
     }
 
     // --- Output branches ---
-    int out_trigTime;
+    UInt_t out_trigTime;
     double out_RecHitEnergy[12];
 
     if (newTree) {
-        outTree->Branch("HGCMetaData_trigTime", &out_trigTime, "HGCMetaData_trigTime/D");
+        outTree->Branch("HGCMetaData_trigTime", &out_trigTime, "HGCMetaData_trigTime/i");
         outTree->Branch("RecHitEnergy", out_RecHitEnergy, "RecHitEnergy[12]/D");
     } else {
         outTree->SetBranchAddress("HGCMetaData_trigTime", &out_trigTime);
@@ -66,25 +71,14 @@ void to_be_named(const std::string& input_file, const std::string& output_file =
     Long64_t nEntries = tree->GetEntries();
     for (Long64_t i = 0; i < nEntries; ++i) {
         tree->GetEntry(i);
-
-        // Copy trigger time
         out_trigTime = HGCMetaData_trigTime;
-
-        // Reset RecHitEnergy
         for (int j = 0; j < 12; ++j) out_RecHitEnergy[j] = 0.0;
-
-        // Safety check
-        if (!HGCHit_layer || !HGCHit_energy) continue;
-
-        // Loop over hits
-        size_t nHits = HGCHit_layer->size();
-        for (size_t idx = 0; idx < nHits; ++idx) {
-            int layer = HGCHit_layer->at(idx);
-            if (layer >= 1 && layer <= 12) {
-                out_RecHitEnergy[layer - 1] += HGCHit_energy->at(idx);
-            }
+        for (UInt_t idx = 0; idx < nHGCHit; ++idx) {
+            int layer = HGCHit_layer[idx];
+            if (layer >= 1 && layer <= 12)
+                out_RecHitEnergy[layer - 1] += HGCHit_energy[idx];
         }
-
+	//std::cout<<"out_RecHitEnergy[0] = "<<out_RecHitEnergy[0]<<std::endl;
         outTree->Fill();
     }
 
