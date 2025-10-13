@@ -419,3 +419,140 @@ void draw_2D_histo(const std::string& input_root_file,
 
     std::cout << "2D histogram " << histo_name << " saved to " << output_root_file << std::endl;
 }
+
+void draw_2D_multi_histo(int length,
+                         const std::string& input_root_file,
+                         const std::string& tree_name,
+                         const std::string& branch_for_x,
+                         const std::string& branch_for_y,
+                         const std::vector<std::string>& histo_names,
+                         const std::vector<std::string>& histo_titles,
+                         int bins_x, int bins_y,
+                         double min_x, double min_y,
+                         double max_x, double max_y,
+                         const std::string& x_title = "ADC",
+                         const std::string& y_title = "Events",
+                         const std::string& output_root_file = "output.root")
+{
+    // --- Input validation
+    if (histo_names.size() != static_cast<size_t>(length) ||
+        histo_titles.size() != static_cast<size_t>(length)) {
+        std::cerr << "Error: histo_names and histo_titles must have size = length" << std::endl;
+        return;
+    }
+
+    // --- Open input file
+    TFile *f_in = TFile::Open(input_root_file.c_str(), "READ");
+    if (!f_in || f_in->IsZombie()) {
+        std::cerr << "Error: cannot open input file " << input_root_file << std::endl;
+        return;
+    }
+
+    // --- Get tree
+    TTree *t1 = nullptr;
+    f_in->GetObject(tree_name.c_str(), t1);
+    if (!t1) {
+        std::cerr << "Error: cannot find tree " << tree_name << std::endl;
+        f_in->Close();
+        return;
+    }
+
+    // --- Get branches
+    TBranch *branch_x = t1->GetBranch(branch_for_x.c_str());
+    TBranch *branch_y = t1->GetBranch(branch_for_y.c_str());
+    if (!branch_x || !branch_y) {
+        std::cerr << "Error: could not find both branches "
+                  << branch_for_x << " and " << branch_for_y << std::endl;
+        f_in->Close();
+        return;
+    }
+
+    // --- Get leaves
+    TLeaf *leaf_x = branch_x->GetLeaf(branch_for_x.c_str());
+    TLeaf *leaf_y = branch_y->GetLeaf(branch_for_y.c_str());
+    if (!leaf_x || !leaf_y) {
+        std::cerr << "Error: could not get leaves for branches." << std::endl;
+        f_in->Close();
+        return;
+    }
+
+    std::string type_x = leaf_x->GetTypeName();
+    std::string type_y = leaf_y->GetTypeName();
+
+    std::cout << "Detected X branch type: " << type_x << std::endl;
+    std::cout << "Detected Y branch type: " << type_y << std::endl;
+
+    Long64_t n_entries = t1->GetEntries();
+    std::cout << "Entries in tree: " << n_entries << std::endl;
+
+    // --- Create histograms
+    std::vector<TH2F*> histos(length);
+    for (int j = 0; j < length; ++j) {
+        histos[j] = new TH2F(histo_names[j].c_str(), histo_titles[j].c_str(),
+                             bins_x, min_x, max_x, bins_y, min_y, max_y);
+        histos[j]->SetDirectory(nullptr);
+        histos[j]->GetXaxis()->SetTitle(x_title.c_str());
+        histos[j]->GetYaxis()->SetTitle(y_title.c_str());
+    }
+
+    // --- Dispatch type handling
+    auto fill_histo_array = [&](auto& val_x, auto* val_y_array) {
+        t1->SetBranchAddress(branch_for_x.c_str(), &val_x);
+        t1->SetBranchAddress(branch_for_y.c_str(), &val_y_array);
+
+        for (Long64_t i = 0; i < n_entries; ++i) {
+            t1->GetEntry(i);
+            for (int j = 0; j < length; ++j) {
+                histos[j]->Fill(val_x, val_y_array[j]);
+            }
+        }
+    };
+
+    // --- Match type combinations
+    if (type_y == "Float_t") {
+        std::vector<Float_t> y_vec(length);
+        if (type_x == "Float_t") { Float_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "Double_t") { Double_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "UInt_t") { UInt_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "Int_t") { Int_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "UShort_t") { UShort_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "Short_t") { Short_t x; fill_histo_array(x, y_vec.data()); }
+        else std::cerr << "Unsupported X type: " << type_x << std::endl;
+    }
+    else if (type_x == "Double_t") {
+        std::vector<Double_t> x_vec(length);
+        if (type_y == "Float_t") { Float_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "Double_t") { Double_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "UInt_t") { UInt_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "Int_t") { Int_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "UShort_t") { UShort_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "Short_t") { Short_t y; fill_histo_array(x_vec.data(), y); }
+        else std::cerr << "Unsupported Y type: " << type_y << std::endl;
+    }
+    else if (type_x == "Int_t") {
+        std::vector<Int_t> x_vec(length);
+        if (type_y == "Float_t") { Float_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "Double_t") { Double_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "UInt_t") { UInt_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "Int_t") { Int_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "UShort_t") { UShort_t y; fill_histo_array(x_vec.data(), y); }
+        else if (type_y == "Short_t") { Short_t y; fill_histo_array(x_vec.data(), y); }
+        else std::cerr << "Unsupported Y type: " << type_y << std::endl;
+    }
+    else {
+        std::cerr << "Unsupported X type: " << type_x << std::endl;
+    }
+
+    std::cout << "Histogram filling complete." << std::endl;
+
+    // --- Write histograms to output
+    TFile *f_out = TFile::Open(output_root_file.c_str(), "RECREATE");
+    for (auto* h : histos) h->Write();
+    f_out->Close();
+
+    // --- Cleanup
+    f_in->Close();
+    for (auto* h : histos) delete h;
+
+    std::cout << "All 2D histograms saved to " << output_root_file << std::endl;
+}
