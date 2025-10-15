@@ -495,10 +495,10 @@ void draw_2D_multi_histo(int length,
         histos[j]->GetYaxis()->SetTitle(y_title.c_str());
     }
 
-    // --- Dispatch type handling
+    // --- Lambda for filling histograms
     auto fill_histo_array = [&](auto& val_x, auto* val_y_array) {
         t1->SetBranchAddress(branch_for_x.c_str(), &val_x);
-        t1->SetBranchAddress(branch_for_y.c_str(), &val_y_array);
+        t1->SetBranchAddress(branch_for_y.c_str(), val_y_array);
 
         for (Long64_t i = 0; i < n_entries; ++i) {
             t1->GetEntry(i);
@@ -508,7 +508,7 @@ void draw_2D_multi_histo(int length,
         }
     };
 
-    // --- Match type combinations
+    // --- Type dispatch
     if (type_y == "Float_t") {
         std::vector<Float_t> y_vec(length);
         if (type_x == "Float_t") { Float_t x; fill_histo_array(x, y_vec.data()); }
@@ -519,28 +519,28 @@ void draw_2D_multi_histo(int length,
         else if (type_x == "Short_t") { Short_t x; fill_histo_array(x, y_vec.data()); }
         else std::cerr << "Unsupported X type: " << type_x << std::endl;
     }
-    else if (type_x == "Double_t") {
-        std::vector<Double_t> x_vec(length);
-        if (type_y == "Float_t") { Float_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "Double_t") { Double_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "UInt_t") { UInt_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "Int_t") { Int_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "UShort_t") { UShort_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "Short_t") { Short_t y; fill_histo_array(x_vec.data(), y); }
-        else std::cerr << "Unsupported Y type: " << type_y << std::endl;
+    else if (type_y == "Double_t") {
+        std::vector<Double_t> y_vec(length);
+        if (type_x == "Float_t") { Float_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "Double_t") { Double_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "UInt_t") { UInt_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "Int_t") { Int_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "UShort_t") { UShort_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "Short_t") { Short_t x; fill_histo_array(x, y_vec.data()); }
+        else std::cerr << "Unsupported X type: " << type_x << std::endl;
     }
-    else if (type_x == "Int_t") {
-        std::vector<Int_t> x_vec(length);
-        if (type_y == "Float_t") { Float_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "Double_t") { Double_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "UInt_t") { UInt_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "Int_t") { Int_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "UShort_t") { UShort_t y; fill_histo_array(x_vec.data(), y); }
-        else if (type_y == "Short_t") { Short_t y; fill_histo_array(x_vec.data(), y); }
-        else std::cerr << "Unsupported Y type: " << type_y << std::endl;
+    else if (type_y == "Int_t") {
+        std::vector<Int_t> y_vec(length);
+        if (type_x == "Float_t") { Float_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "Double_t") { Double_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "UInt_t") { UInt_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "Int_t") { Int_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "UShort_t") { UShort_t x; fill_histo_array(x, y_vec.data()); }
+        else if (type_x == "Short_t") { Short_t x; fill_histo_array(x, y_vec.data()); }
+        else std::cerr << "Unsupported X type: " << type_x << std::endl;
     }
     else {
-        std::cerr << "Unsupported X type: " << type_x << std::endl;
+        std::cerr << "Unsupported Y type: " << type_y << std::endl;
     }
 
     std::cout << "Histogram filling complete." << std::endl;

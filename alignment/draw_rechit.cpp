@@ -12,15 +12,15 @@ int main(){
 	titles.push_back(title);
     }
 
-    draw_2D_histo(12,
+    draw_2D_multi_histo(12,
 	      "merged_output.root",
               "ProcessedEvents",
               "HGCMetaData_trigTime","RecHitEnergy",
               names,
               titles,
-              50,200,
-              50,-100,
-              150,100,
+              50,150,
+              0,0,
+              50,150,
               "Time_trig", "RecHitEnergy",
               "RecHit.root");
     return 0;

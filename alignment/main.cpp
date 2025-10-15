@@ -96,7 +96,7 @@ int main() {
     std::vector<std::string> NANO_files;
     try {
         // Load directories from JSON
-	dirs = load_run_directories("run_directories.json","muon_runs");
+	dirs = load_run_directories("run_directories_new.json","muon_runs");
 
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << '\n';
